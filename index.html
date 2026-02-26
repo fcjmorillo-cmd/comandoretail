@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comando Retail | Gestión Integral de Negocios</title>
+    <meta name="description"
+        content="La solución definitiva para la gestión de hostelería y comercio minorista. Sistema 100% local, seguro y eficiente.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="glass-nav">
+        <div class="container">
+            <div class="logo">
+                <img src="logo.png" alt="Logo" style="height: 40px; width: auto;">
+                <span>COMANDO RETAIL</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Características</a></li>
+                <li><a href="#download">Descargar</a></li>
+                <li><a href="./legal/terms.html">Legal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <span class="badge">NUEVA VERSIÓN 2026</span>
+                <h1>Tu negocio en tu móvil, <span class="gradient-text">y ahora en tu PC.</span></h1>
+                <p>La gestión más potente para carnicerías y hostelería. <strong>Descarga la App en tu móvil o
+                        tablet</strong> y obtén la versión para Windows totalmente gratis.</p>
+                <div class="hero-actions">
+                    <a href="https://play.google.com" class="btn btn-primary"><i class="fab fa-google-play"></i>
+                        Descargar App</a>
+                    <a href="#download" class="btn btn-secondary">Obtener Versión Windows</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <img src="logo.png" alt="Comando Retail Logo" class="floating-img" style="border-radius: 20%;">
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">¿Cómo obtener la versión Windows?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>1. Baja la App</h3>
+                    <p>Instala Comando Retail en tu móvil o tablet Android desde la Play Store.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-key"></i>
+                    <h3>2. Obtén tu Código</h3>
+                    <p>En el apartado "Vinculación" de la App, encontrarás tu código de acceso Windows.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-desktop"></i>
+                    <h3>3. ¡Listo!</h3>
+                    <p>Introduce el código en esta web y descarga la versión de escritorio gratis.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="download" class="download">
+        <div class="container">
+            <div class="download-box glass">
+                <h2>Acceso Versión Windows</h2>
+                <p>Si ya eres usuario de la App, introduce tu código para desbloquear la descarga.</p>
+
+                <div id="license-form" class="license-area">
+                    <p class="step-hint">Introduce el código que aparece en tu App (Módulo Vinculación)</p>
+                    <div class="input-group">
+                        <input type="text" id="license-code" placeholder="RETAIL-XXXX-XXXX" maxlength="20">
+                        <button onclick="validateLicense()" id="verify-btn" class="btn btn-primary">Validar y
+                            Descargar</button>
+                    </div>
+                    <p id="verify-status" class="status-msg"></p>
+                </div>
+
+                <div id="download-area" class="download-actions"
+                    style="display: none; opacity: 0; transform: translateY(20px); transition: 0.5s;">
+                    <a href="#" class="btn btn-large btn-success">
+                        <i class="fab fa-windows"></i> Descargar Instalador (.exe)
+                    </a>
+                    <p class="success-hint">✅ ¡Código validado! Ya puedes descargar la versión Pro.</p>
+                </div>
+                <span class="disclaimer">* El acceso a Windows está incluido con tu suscripción activa en la App
+                    móvil.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supabase Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://pcixnribgwkshcrverqx.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_KIObsdNBbn1ZXsQQe45DCQ_4fDHPIbw'; // Usando la misma que la app
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function validateLicense() {
+            const codeInput = document.getElementById('license-code');
+            const status = document.getElementById('verify-status');
+            const verifyBtn = document.getElementById('verify-btn');
+            const downloadArea = document.getElementById('download-area');
+            const code = codeInput.value.trim().toUpperCase();
+
+            if (!code) {
+                status.innerText = "Por favor, introduce tu código.";
+                status.style.color = "#ff4444";
+                return;
+            }
+
+            status.innerText = "Verificando...";
+            status.style.color = "#60a5fa";
+            verifyBtn.disabled = true;
+
+            try {
+                // Consultamos la tabla profiles para ver si el código existe y el usuario es premium
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('id, subscription_status')
+                    .eq('windows_license_key', code)
+                    .maybeSingle();
+
+                if (error) throw error;
+
+                if (data && data.subscription_status === true) {
+                    status.innerText = "¡Verificación exitosa!";
+                    status.style.color = "#10b981";
+
+                    // Mostrar descarga con efecto
+                    document.getElementById('license-form').style.display = 'none';
+                    downloadArea.style.display = 'block';
+                    setTimeout(() => {
+                        downloadArea.style.opacity = '1';
+                        downloadArea.style.transform = 'translateY(0)';
+                    }, 50);
+                } else {
+                    status.innerText = "Código inválido o suscripción inactiva.";
+                    status.style.color = "#ff4444";
+                    verifyBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Error al conectar con el servidor.";
+                status.style.color = "#ff4444";
+                verifyBtn.disabled = false;
+            }
+        }
+    </script>
+
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-info">
+                <div class="logo">
+                    <i class="fas fa-rocket"></i> COMANDO RETAIL
+                </div>
+                <p>Tecnología española para el pequeño y mediano comercio.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="./legal/privacy-policy.html">Privacidad</a></li>
+                    <li><a href="./legal/terms.html">Términos y Condiciones</a></li>
+                    <li><a href="./legal/terms.html#disclaimer">Aviso Fiscal</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 COMANDO RETAIL. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
