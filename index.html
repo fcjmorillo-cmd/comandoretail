@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comando Retail | Gestión Integral de Negocios</title>
-    <meta name="description"
-        content="La solución definitiva para la gestión de hostelería y comercio minorista. Sistema 100% local, seguro y eficiente.">
+    <meta name="description" content="La solución definitiva para la gestión de hostelería y comercio minorista. Sistema 100% local, seguro y eficiente.">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
     <nav class="glass-nav">
         <div class="container">
@@ -36,11 +31,9 @@
             <div class="hero-content">
                 <span class="badge">NUEVA VERSIÓN 2026</span>
                 <h1>Tu negocio en tu móvil, <span class="gradient-text">y ahora en tu PC.</span></h1>
-                <p>La gestión más potente para carnicerías y hostelería. <strong>Descarga la App en tu móvil o
-                        tablet</strong> y obtén la versión para Windows totalmente gratis.</p>
+                <p>La gestión más potente para carnicerías y hostelería. <strong>Descarga la App en tu móvil o tablet</strong> y obtén la versión para Windows totalmente gratis.</p>
                 <div class="hero-actions">
-                    <a href="https://play.google.com" class="btn btn-primary"><i class="fab fa-google-play"></i>
-                        Descargar App</a>
+                    <a href="https://play.google.com" class="btn btn-primary"><i class="fab fa-google-play"></i> Descargar App</a>
                     <a href="#download" class="btn btn-secondary">Obtener Versión Windows</a>
                 </div>
             </div>
@@ -78,63 +71,52 @@
             <div class="download-box glass">
                 <h2>Acceso Versión Windows</h2>
                 <p>Si ya eres usuario de la App, introduce tu código para desbloquear la descarga.</p>
-
                 <div id="license-form" class="license-area">
                     <p class="step-hint">Introduce el código que aparece en tu App (Módulo Vinculación)</p>
                     <div class="input-group">
                         <input type="text" id="license-code" placeholder="RETAIL-XXXX-XXXX" maxlength="20">
-                        <button onclick="validateLicense()" id="verify-btn" class="btn btn-primary">Validar y
-                            Descargar</button>
+                        <button onclick="validateLicense()" id="verify-btn" class="btn btn-primary">Validar y Descargar</button>
                     </div>
                     <p id="verify-status" class="status-msg"></p>
                 </div>
-
-                <div id="download-area" class="download-actions"
-                    style="display: none; opacity: 0; transform: translateY(20px); transition: 0.5s;">
+                <div id="download-area" class="download-actions" style="display: none; opacity: 0; transform: translateY(20px); transition: 0.5s;">
                     <a id="download-btn" href="#" class="btn btn-large btn-success" onclick="handleDownload(event)">
                         <i class="fab fa-windows"></i> Descargar Instalador (.exe)
                     </a>
                     <p class="success-hint">✅ ¡Código validado! Ya puedes descargar la versión Pro.</p>
                     <p id="download-note" style="font-size:12px; color:#94a3b8; margin-top:8px;"></p>
                 </div>
-                <span class="disclaimer">* El acceso a Windows está incluido con tu suscripción activa en la App
-                    móvil.</span>
+                <span class="disclaimer">* El acceso a Windows está incluido con tu suscripción activa en la App móvil.</span>
             </div>
         </div>
     </section>
 
-    <!-- Supabase Integration -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://pcixnribgwkshcrverqx.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_KIObsdNBbn1ZXsQQe45DCQ_4fDHPIbw';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const WINDOWS_DOWNLOAD_URL = 'https://drive.google.com/uc?export=download&id=1hGmCKg_puJmUHC-Hx26dMn8qp0M1HY0W';
 
         function handleDownload(event) {
             if (!WINDOWS_DOWNLOAD_URL) {
                 event.preventDefault();
-                alert('El instalador aún no está disponible en descarga online.\n\nContacta al administrador para obtener el archivo de instalación.');
+                alert('El instalador aún no está disponible en descarga online.');
             }
         }
 
         function showDownloadArea() {
+            document.getElementById('license-form').style.display = 'none';
             const downloadArea = document.getElementById('download-area');
             const downloadBtn = document.getElementById('download-btn');
-            const downloadNote = document.getElementById('download-note');
-
-            document.getElementById('license-form').style.display = 'none';
             downloadArea.style.display = 'block';
-
             if (WINDOWS_DOWNLOAD_URL) {
                 downloadBtn.href = WINDOWS_DOWNLOAD_URL;
                 downloadBtn.removeAttribute('onclick');
-                downloadNote.innerText = '';
+                document.getElementById('download-note').innerText = '';
             } else {
-                downloadNote.innerText = '⚠️ Enlace de descarga pendiente de configurar. Contacta con soporte.';
+                document.getElementById('download-note').innerText = '⚠️ Enlace pendiente de configurar.';
             }
-
             setTimeout(() => {
                 downloadArea.style.opacity = '1';
                 downloadArea.style.transform = 'translateY(0)';
@@ -142,51 +124,34 @@
         }
 
         async function validateLicense() {
-            const codeInput = document.getElementById('license-code');
+            const code = document.getElementById('license-code').value.trim().toUpperCase();
             const status = document.getElementById('verify-status');
             const verifyBtn = document.getElementById('verify-btn');
-            const code = codeInput.value.trim().toUpperCase();
-
-            if (!code) {
-                status.innerText = "Por favor, introduce tu código.";
-                status.style.color = "#ff4444";
-                return;
-            }
-
-            status.innerText = "Verificando...";
-            status.style.color = "#60a5fa";
+            if (!code) { status.innerText = 'Por favor, introduce tu código.'; status.style.color = '#ff4444'; return; }
+            status.innerText = 'Verificando...';
+            status.style.color = '#60a5fa';
             verifyBtn.disabled = true;
-
-            // Código especial de desarrollo/pruebas
             if (code === 'RETAIL-DEBUG-2026') {
-                status.innerText = "¡Verificación exitosa!";
-                status.style.color = "#10b981";
+                status.innerText = '¡Verificación exitosa!';
+                status.style.color = '#10b981';
                 showDownloadArea();
                 return;
             }
-
             try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('id, subscription_status')
-                    .eq('windows_license_key', code)
-                    .maybeSingle();
-
+                const { data, error } = await supabaseClient.from('profiles').select('id, subscription_status').eq('windows_license_key', code).maybeSingle();
                 if (error) throw error;
-
                 if (data && data.subscription_status === true) {
-                    status.innerText = "¡Verificación exitosa!";
-                    status.style.color = "#10b981";
+                    status.innerText = '¡Verificación exitosa!';
+                    status.style.color = '#10b981';
                     showDownloadArea();
                 } else {
-                    status.innerText = "Código inválido o suscripción inactiva.";
-                    status.style.color = "#ff4444";
+                    status.innerText = 'Código inválido o suscripción inactiva.';
+                    status.style.color = '#ff4444';
                     verifyBtn.disabled = false;
                 }
             } catch (err) {
-                console.error(err);
-                status.innerText = "Error al conectar con el servidor.";
-                status.style.color = "#ff4444";
+                status.innerText = 'Error al conectar con el servidor.';
+                status.style.color = '#ff4444';
                 verifyBtn.disabled = false;
             }
         }
@@ -195,9 +160,7 @@
     <footer>
         <div class="container footer-grid">
             <div class="footer-info">
-                <div class="logo">
-                    <i class="fas fa-rocket"></i> COMANDO RETAIL
-                </div>
+                <div class="logo"><i class="fas fa-rocket"></i> COMANDO RETAIL</div>
                 <p>Tecnología española para el pequeño y mediano comercio.</p>
             </div>
             <div class="footer-links">
@@ -209,12 +172,11 @@
                 </ul>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 COMANDO RETAIL. Todos los derechos reservados.</p>
-        </div>
+        <div class="footer-bottom"><p>&copy; 2026 COMANDO RETAIL. Todos los derechos reservados.</p></div>
     </footer>
 </body>
-
 </html>
+
+
 
 
