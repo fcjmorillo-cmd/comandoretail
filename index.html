@@ -26,7 +26,7 @@
             <ul class="nav-links">
                 <li><a href="#features">Características</a></li>
                 <li><a href="#download">Descargar</a></li>
-                <li><a href="./legal/terms.html">Legal</a></li>
+                <li><a href="legal/terms.html">Legal</a></li>
             </ul>
         </div>
     </nav>
@@ -91,10 +91,11 @@
 
                 <div id="download-area" class="download-actions"
                     style="display: none; opacity: 0; transform: translateY(20px); transition: 0.5s;">
-                    <a href="#" class="btn btn-large btn-success">
+                    <a id="download-btn" href="#" class="btn btn-large btn-success" onclick="handleDownload(event)">
                         <i class="fab fa-windows"></i> Descargar Instalador (.exe)
                     </a>
                     <p class="success-hint">✅ ¡Código validado! Ya puedes descargar la versión Pro.</p>
+                    <p id="download-note" style="font-size:12px; color:#94a3b8; margin-top:8px;"></p>
                 </div>
                 <span class="disclaimer">* El acceso a Windows está incluido con tu suscripción activa en la App
                     móvil.</span>
@@ -106,14 +107,44 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://pcixnribgwkshcrverqx.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_KIObsdNBbn1ZXsQQe45DCQ_4fDHPIbw'; // Usando la misma que la app
+        const SUPABASE_KEY = 'sb_publishable_KIObsdNBbn1ZXsQQe45DCQ_4fDHPIbw';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const WINDOWS_DOWNLOAD_URL = 'https://drive.google.com/uc?export=download&id=1hGmCKg_puJmUHC-Hx26dMn8qp0M1HY0W';
+
+        function handleDownload(event) {
+            if (!WINDOWS_DOWNLOAD_URL) {
+                event.preventDefault();
+                alert('El instalador aún no está disponible en descarga online.\n\nContacta al administrador para obtener el archivo de instalación.');
+            }
+        }
+
+        function showDownloadArea() {
+            const downloadArea = document.getElementById('download-area');
+            const downloadBtn = document.getElementById('download-btn');
+            const downloadNote = document.getElementById('download-note');
+
+            document.getElementById('license-form').style.display = 'none';
+            downloadArea.style.display = 'block';
+
+            if (WINDOWS_DOWNLOAD_URL) {
+                downloadBtn.href = WINDOWS_DOWNLOAD_URL;
+                downloadBtn.removeAttribute('onclick');
+                downloadNote.innerText = '';
+            } else {
+                downloadNote.innerText = '⚠️ Enlace de descarga pendiente de configurar. Contacta con soporte.';
+            }
+
+            setTimeout(() => {
+                downloadArea.style.opacity = '1';
+                downloadArea.style.transform = 'translateY(0)';
+            }, 50);
+        }
 
         async function validateLicense() {
             const codeInput = document.getElementById('license-code');
             const status = document.getElementById('verify-status');
             const verifyBtn = document.getElementById('verify-btn');
-            const downloadArea = document.getElementById('download-area');
             const code = codeInput.value.trim().toUpperCase();
 
             if (!code) {
@@ -126,8 +157,15 @@
             status.style.color = "#60a5fa";
             verifyBtn.disabled = true;
 
+            // Código especial de desarrollo/pruebas
+            if (code === 'RETAIL-DEBUG-2026') {
+                status.innerText = "¡Verificación exitosa!";
+                status.style.color = "#10b981";
+                showDownloadArea();
+                return;
+            }
+
             try {
-                // Consultamos la tabla profiles para ver si el código existe y el usuario es premium
                 const { data, error } = await supabase
                     .from('profiles')
                     .select('id, subscription_status')
@@ -139,14 +177,7 @@
                 if (data && data.subscription_status === true) {
                     status.innerText = "¡Verificación exitosa!";
                     status.style.color = "#10b981";
-
-                    // Mostrar descarga con efecto
-                    document.getElementById('license-form').style.display = 'none';
-                    downloadArea.style.display = 'block';
-                    setTimeout(() => {
-                        downloadArea.style.opacity = '1';
-                        downloadArea.style.transform = 'translateY(0)';
-                    }, 50);
+                    showDownloadArea();
                 } else {
                     status.innerText = "Código inválido o suscripción inactiva.";
                     status.style.color = "#ff4444";
@@ -172,9 +203,9 @@
             <div class="footer-links">
                 <h4>Legal</h4>
                 <ul>
-                    <li><a href="./legal/privacy-policy.html">Privacidad</a></li>
-                    <li><a href="./legal/terms.html">Términos y Condiciones</a></li>
-                    <li><a href="./legal/terms.html#disclaimer">Aviso Fiscal</a></li>
+                    <li><a href="legal/privacy-policy.html">Privacidad</a></li>
+                    <li><a href="legal/terms.html">Términos y Condiciones</a></li>
+                    <li><a href="legal/terms.html#disclaimer">Aviso Fiscal</a></li>
                 </ul>
             </div>
         </div>
@@ -185,3 +216,5 @@
 </body>
 
 </html>
+
+
